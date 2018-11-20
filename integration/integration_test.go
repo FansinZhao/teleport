@@ -59,9 +59,10 @@ import (
 )
 
 const (
-	Host   = "localhost"
-	HostID = "00000000-0000-0000-0000-000000000000"
-	Site   = "local-site"
+	Loopback = "127.0.0.1"
+	Host     = "localhost"
+	HostID   = "00000000-0000-0000-0000-000000000000"
+	Site     = "local-site"
 
 	AllocatePortsNum = 300
 )
@@ -1173,7 +1174,7 @@ func (s *IntSuite) TestHA(c *check.C) {
 	}
 
 	cmd := []string{"echo", "hello world"}
-	tc, err := b.NewClient(ClientConfig{Login: username, Cluster: "cluster-a", Host: "127.0.0.1", Port: sshPort})
+	tc, err := b.NewClient(ClientConfig{Login: username, Cluster: "cluster-a", Host: Loopback, Port: sshPort})
 	c.Assert(err, check.IsNil)
 	output := &bytes.Buffer{}
 	tc.Stdout = output
@@ -1314,7 +1315,7 @@ func (s *IntSuite) TestMapRoles(c *check.C) {
 	c.Assert(nodes, check.HasLen, 2)
 
 	cmd := []string{"echo", "hello world"}
-	tc, err := main.NewClient(ClientConfig{Login: username, Cluster: clusterAux, Host: "127.0.0.1", Port: sshPort})
+	tc, err := main.NewClient(ClientConfig{Login: username, Cluster: clusterAux, Host: Loopback, Port: sshPort})
 	c.Assert(err, check.IsNil)
 	output := &bytes.Buffer{}
 	tc.Stdout = output
@@ -1519,7 +1520,7 @@ func (s *IntSuite) trustedClusters(c *check.C, multiplex bool) {
 	}
 
 	cmd := []string{"echo", "hello world"}
-	tc, err := main.NewClient(ClientConfig{Login: username, Cluster: clusterAux, Host: "127.0.0.1", Port: sshPort})
+	tc, err := main.NewClient(ClientConfig{Login: username, Cluster: clusterAux, Host: Loopback, Port: sshPort})
 	c.Assert(err, check.IsNil)
 	output := &bytes.Buffer{}
 	tc.Stdout = output
@@ -1601,7 +1602,7 @@ func (s *IntSuite) TestDiscovery(c *check.C) {
 	username := s.me.Username
 
 	// create load balancer for main cluster proxies
-	frontend := *utils.MustParseAddr(fmt.Sprintf("127.0.0.1:%v", s.getPorts(1)[0]))
+	frontend := *utils.MustParseAddr(net.JoinHostPort(Loopback, strconv.Itoa(s.getPorts(1)[0])))
 	lb, err := utils.NewLoadBalancer(context.TODO(), frontend)
 	c.Assert(err, check.IsNil)
 	c.Assert(lb.Listen(), check.IsNil)
@@ -1647,7 +1648,7 @@ func (s *IntSuite) TestDiscovery(c *check.C) {
 	c.Assert(err, check.IsNil)
 
 	// add second proxy as a backend to the load balancer
-	lb.AddBackend(*utils.MustParseAddr(fmt.Sprintf("127.0.0.1:%v", proxyReverseTunnelPort)))
+	lb.AddBackend(*utils.MustParseAddr(net.JoinHostPort(Loopback, strconv.Itoa(proxyReverseTunnelPort))))
 
 	// At this point the remote cluster should be connected to two proxies in
 	// the main cluster.
@@ -1657,7 +1658,7 @@ func (s *IntSuite) TestDiscovery(c *check.C) {
 	cfg := ClientConfig{
 		Login:   username,
 		Cluster: "cluster-remote",
-		Host:    "127.0.0.1",
+		Host:    Loopback,
 		Port:    remote.GetPortSSHInt(),
 	}
 	output, err := runCommand(main, []string{"echo", "hello world"}, cfg, 1)
@@ -1671,7 +1672,7 @@ func (s *IntSuite) TestDiscovery(c *check.C) {
 	cfgProxy := ClientConfig{
 		Login:   username,
 		Cluster: "cluster-remote",
-		Host:    "127.0.0.1",
+		Host:    Loopback,
 		Port:    remote.GetPortSSHInt(),
 		Proxy:   &proxyConfig,
 	}
@@ -2299,7 +2300,7 @@ func (s *IntSuite) rotateSuccess(c *check.C) {
 
 	cfg := ClientConfig{
 		Login: s.me.Username,
-		Host:  "127.0.0.1",
+		Host:  Loopback,
 		Port:  t.GetPortSSHInt(),
 	}
 	clt, err := t.NewClientWithCreds(cfg, *initialCreds)
@@ -2438,7 +2439,7 @@ func (s *IntSuite) rotateRollback(c *check.C) {
 
 	cfg := ClientConfig{
 		Login: s.me.Username,
-		Host:  "127.0.0.1",
+		Host:  Loopback,
 		Port:  t.GetPortSSHInt(),
 	}
 	clt, err := t.NewClientWithCreds(cfg, *initialCreds)
@@ -2614,7 +2615,7 @@ func (s *IntSuite) rotateTrustedClusters(c *check.C) {
 	// credentials should work
 	cfg := ClientConfig{
 		Login:   s.me.Username,
-		Host:    "127.0.0.1",
+		Host:    Loopback,
 		Cluster: clusterAux,
 		Port:    aux.GetPortSSHInt(),
 	}
