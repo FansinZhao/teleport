@@ -17,12 +17,25 @@ limitations under the License.
 package main
 
 import (
+	//"fmt"
+	//"io/ioutil"
 	"os"
+	//"syscall"
 
 	"github.com/gravitational/teleport/tool/teleport/common"
 )
 
 func main() {
+	//_, err := syscall.Setsid()
+	//fmt.Printf("--> err: %v\n", err)
+
+	//bytes, err := ioutil.ReadFile("/proc/self/sessionid")
+	//if err != nil {
+	//	fmt.Printf("Unable to read file: %v.\n", err)
+	//	return
+	//}
+	//fmt.Printf("--> /proc/self/sessionid: %v.\n", string(bytes))
+
 	common.Run(common.Options{
 		Args: os.Args[1:],
 	})

@@ -97,7 +97,7 @@ func (u *UserCommand) TryRun(cmd string, client auth.ClientI) (match bool, err e
 // Add creates a new sign-up token and prints a token URL to stdout.
 // A user is not created until he visits the sign-up URL and completes the process
 func (u *UserCommand) Add(client auth.ClientI) error {
-	// if no local logins were specified, default to 'login'
+	// If no local logins were specified, default to 'login'.
 	if u.allowedLogins == "" {
 		u.allowedLogins = u.login
 	}
@@ -115,8 +115,9 @@ func (u *UserCommand) Add(client auth.ClientI) error {
 		return err
 	}
 
-	// try to auto-suggest the activation link
+	// Try to auto-suggest the activation link.
 	u.PrintSignupURL(client, token, u.ttl)
+
 	return nil
 }
 

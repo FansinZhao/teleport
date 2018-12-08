@@ -1190,6 +1190,19 @@ func (c *Client) CreateSignupToken(user services.UserV1, ttl time.Duration) (str
 	return token, nil
 }
 
+func (c *Client) GetSignupTokens() ([]services.SignupToken, error) {
+	out, err := c.Get(c.Endpoint("signuptokens"), url.Values{})
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
+
+	var tokens []services.SignupToken
+	if err := json.Unmarshal(out.Bytes(), &tokens); err != nil {
+		return nil, trace.Wrap(err)
+	}
+	return tokens, nil
+}
+
 // GetSignupTokenData returns token data for a valid token
 func (c *Client) GetSignupTokenData(token string) (user string, otpQRCode []byte, e error) {
 	out, err := c.Get(c.Endpoint("signuptokens", token), url.Values{})
@@ -2261,6 +2274,8 @@ type IdentityService interface {
 
 	// GetSignupTokenData returns token data for a valid token
 	GetSignupTokenData(token string) (user string, otpQRCode []byte, e error)
+
+	GetSignupTokens() ([]services.SignupToken, error)
 
 	// CreateSignupToken creates one time token for creating account for the user
 	// For each token it creates username and OTP key
