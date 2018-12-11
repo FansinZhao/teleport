@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
+import watermark from 'water-mark-oc'
 import React from 'react';
 import { connect } from 'nuclear-js-react-addons';
 import termGetters from 'app/flux/terminal/getters';
@@ -34,6 +34,7 @@ class Page extends React.Component {
   }
 
   componentDidMount() {
+    watermark({ content: this.props.routeParams.login});
     setTimeout(() => terminalActions.initTerminal(this.props.routeParams), 0);
   }
 
